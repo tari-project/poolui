@@ -16,7 +16,7 @@ var app = angular.module('poolui', [
 	'angular-page-visibility'
 	]).config(['$locationProvider', '$routeProvider', '$mdThemingProvider', function($locationProvider, $routeProvider, $mdThemingProvider) {
 		$locationProvider.hashPrefix('')
-		;	
+		;
 		$mdThemingProvider.theme('default')
 		.primaryPalette('grey')
 		.accentPalette('light-blue');
@@ -72,28 +72,27 @@ var app = angular.module('poolui', [
 
 	}]);
 
-	app.controller('AppCtrl', function($scope, $rootScope, $location, $route, $routeParams, $anchorScroll, $window, $interval, $mdDialog, dataService, timerService, addressService, $mdSidenav, $mdMedia, $localStorage, ngAudio, GLOBALS){
+	app.controller('AppCtrl', function($scope, $rootScope, $location, $route, $routeParams, $anchorScroll, $window,  $mdDialog, dataService, timerService, addressService, $mdSidenav, $mdMedia, $localStorage, ngAudio, GLOBALS){
 		$scope.GLOBALS = GLOBALS;
-		var appCache = window.applicationCache;
 		$scope.$storage = $localStorage;
 
 		$scope.poolList = ["pplns", "pps", "solo"];
 		$scope.poolStats = {}; // All Pool stats
 		$scope.addrStats = {}; // All tracked addresses
 		$scope.lastBlock = {};
-		
+
 		// for miner tracking
 		$scope.yourTotalHashRate = 0;
 
 		// Hashrate Alarm
 		$scope.globalSiren = false;
 		$scope.sirenAudio = ngAudio.load("assets/ding.wav");
-		
+
 		// Update global hashrate and set off alarm if any of the tracked addresses fall below the threshold
 		var updateHashRate = function (addrStats){
 			var totalHashRate = 0;
 			var siren = false;
-			
+
 			_.each(addrStats, function(addr,index) {
 				totalHashRate += addr.hash;
 				if (addr.alarm && addr.hash < addr.alarmLimit) {
@@ -165,21 +164,6 @@ var app = angular.module('poolui', [
 			return dataService.isLoggedIn();
 		}
 
-		// ------- App Update
-		var update = function() {
-			if (appCache.status == window.applicationCache.UPDATEREADY) {
-				appCache.swapCache(); 
-				$window.location.reload();
-			}
-		}
-
-		appCache.addEventListener("updateready", function(event) {
-			update();
-		}, false);
-
-		var updateCache = function () {
-			appCache.update();
-		}
 
 		// API Requests
 		var loadData = function () {
@@ -190,7 +174,7 @@ var app = angular.module('poolui', [
 
 			dataService.getData("/network/stats", function(data){
 				$scope.network = data;
-			});	
+			});
 		}
 
 		var loadOnce = function () {
@@ -202,18 +186,16 @@ var app = angular.module('poolui', [
 		// For FAQ
 		$rootScope.$on('$routeChangeSuccess', function(newRoute, oldRoute) {
 			$location.hash($routeParams.scrollTo);
-			$anchorScroll();  
+			$anchorScroll();
 		});
 
 		// Start doing things
 		loadOnce();
 		loadData();
-		update();
-		
+
 		// Start the timer and register global requests
 		timerService.startTimer(GLOBALS.api_refresh_interval);
 		timerService.register(loadData, 'global');
-		$interval(updateCache, GLOBALS.app_update_interval); // check for app updates every 5 mins
 
 		// Start address tracking servuce after starting timer, only one callback supported at a time
 		addressService.start(function(addrStats) {
