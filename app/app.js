@@ -37,6 +37,11 @@ var app = angular.module('poolui', [
 			controller: 'BlocksCtrl',
 			activetab: 'blocks'
 		})
+		.when('/altblocks', {
+			templateUrl: 'user/altblocks/blocks.html',
+			controller: 'AltBlocksCtrl',
+			activetab: 'altblocks'
+		})
 		.when('/payments', {
 			templateUrl: 'user/payments/payments.html',
 			controller: 'PaymentsCtrl',
