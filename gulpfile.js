@@ -1,6 +1,7 @@
-var gulp = require('gulp');
-var connect = require('gulp-connect');
-var manifest = require('gulp-manifest');
+const gulp = require('gulp');
+const connect = require('gulp-connect');
+const manifest = require('gulp-manifest');
+const replace = require('gulp-replace');
 
 gulp.task('html', function(){
   return gulp.src(['app/**/*.html', '!app/vendor/**/*'])
@@ -16,6 +17,7 @@ gulp.task('css', function(){
 
 gulp.task('js', function(){
   return gulp.src(['app/**/*.js', '!app/vendor/**/*'])
+      .pipe(replace('$API_URL', process.env.API_URL || '/api'))
     .pipe(connect.reload())
     .pipe(gulp.dest('build/'))
 });
