@@ -1,6 +1,7 @@
-var gulp = require('gulp');
-var connect = require('gulp-connect');
-var manifest = require('gulp-manifest');
+const gulp = require('gulp');
+const connect = require('gulp-connect');
+const manifest = require('gulp-manifest');
+const replace = require('gulp-replace');
 
 gulp.task('html', function(){
   return gulp.src(['app/**/*.html', '!app/vendor/**/*'])
@@ -16,6 +17,8 @@ gulp.task('css', function(){
 
 gulp.task('js', function(){
   return gulp.src(['app/**/*.js', '!app/vendor/**/*'])
+    .pipe(replace('$API_URL', process.env.API_URL || '/api'))
+    .pipe(replace('$POOL_NAME', process.env.POOL_NAME || 'acmepool.com'))
     .pipe(connect.reload())
     .pipe(gulp.dest('build/'))
 });
@@ -67,20 +70,21 @@ gulp.task('watch', function () {
   gulp.watch(['./assets/*.*'], ['assets', 'manifest']);
 });
 
-gulp.task('manifest', function(){
-  gulp.src([
-    'build/**/*'
-    ], { base: './build' })
-    .pipe(manifest({
-      hash: true,
-      preferOnline: true,
-      network: ['*'],
-      filename: 'app.manifest',
-      exclude: 'app.manifest'
-     }))
-    .pipe(connect.reload())
-    .pipe(gulp.dest('build'));
+gulp.task('manifest', function(done){
+  // gulp.src([
+  //   'build/**/*'
+  //   ], { base: './build' })
+  //   .pipe(manifest({
+  //     hash: true,
+  //     preferOnline: true,
+  //     network: ['*'],
+  //     filename: 'app.manifest',
+  //     exclude: 'app.manifest'
+  //    }))
+  //   .pipe(connect.reload())
+  //   .pipe(gulp.dest('build'));
+  done();
 });
 
-gulp.task('build', [ 'html', 'css', 'js', 'assets', 'vendor', 'manifest' ]);
-gulp.task('default', [ 'build', 'connect', 'watch' ]);
+gulp.task('build', gulp.series([ 'html', 'css', 'js', 'assets', 'vendor', 'manifest' ]));
+gulp.task('default', gulp.series([ 'build', 'connect', 'watch' ]));
