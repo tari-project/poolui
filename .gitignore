@@ -10,3 +10,4 @@ app/vendor/
 build/
 app/globals.js
 *.iml
+.env
